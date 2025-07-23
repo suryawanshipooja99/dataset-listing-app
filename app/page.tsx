@@ -16,7 +16,12 @@ export default function Home() {
   const [filters, setFilters] = useState({ query: '', geography: '', sectors: '', tags: '', formats: '' });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [aggregations, setAggregations] = useState<any>({});
+  const [aggregations, setAggregations] = useState<{
+    Geography?: Record<string, number>;
+    sectors?: Record<string, number>;
+    tags?: Record<string, number>;
+    formats?: Record<string, number>;
+  }>({});
   const [loading, setLoading] = useState(false);
   const size = 9;
 

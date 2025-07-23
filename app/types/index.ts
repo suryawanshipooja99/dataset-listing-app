@@ -25,7 +25,11 @@ export interface Dataset {
   trending_score: number;
   is_individual_dataset: boolean;
   organization?: Organization;
-  user?: any;
+  user?: {
+    id: string;
+    name: string;
+    email?: string;
+  } | null;
 }
 
 export interface Filters {
