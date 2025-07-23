@@ -1,103 +1,160 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import Head from 'next/head';
+import { fetchDatasets } from './services/api';
+import FilterBar from './components/FilterBar';
+import ViewToggle from './components/ViewToggle';
+import CardView from './components/CardView';
+import ListView from './components/ListView';
+import Pagination from './components/Pagination';
+
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [datasets, setDatasets] = useState([]);
+  const [viewType, setViewType] = useState<'card' | 'list'>('card');
+  const [filters, setFilters] = useState({ query: '', geography: '', sectors: '', tags: '', formats: '' });
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [aggregations, setAggregations] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const size = 9;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const { results, total, aggregations } = await fetchDatasets({ ...filters, page, size });
+        setDatasets(results);
+        setTotal(total);
+        setAggregations(aggregations);
+      } catch (error) {
+        console.error('Failed to load datasets:', error);
+        setDatasets([]);
+        setTotal(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [filters, page]);
+
+  return (
+    <>
+      <Head>
+        <title>Dataset Listing - CivicDataSpace</title>
+      </Head>
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        {/* Header */}
+        <div className="bg-blue-600 text-white py-3 px-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-2">
+                <span className="text-lg font-bold">🌐 CivicDataSpace</span>
+              </div>
+              <nav className="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#" className="hover:text-blue-200 transition-colors">ALL DATA</a>
+                <a href="#" className="hover:text-blue-200 transition-colors">SECTORS</a>
+                <a href="#" className="hover:text-blue-200 transition-colors">USE CASES</a>
+                <a href="#" className="hover:text-blue-200 transition-colors">PUBLISHERS</a>
+                <a href="#" className="hover:text-blue-200 transition-colors">ABOUT US</a>
+              </nav>
+            </div>
+            <button className="bg-orange-500 hover:bg-orange-400 px-4 py-2 rounded text-sm font-medium transition-colors">
+              LOGIN / SIGN UP
+            </button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Orange sub-header */}
+        <div className="bg-orange-500 text-white py-2 px-6">
+          <div className="text-sm font-medium">
+            HOME
+          </div>
+        </div>
+
+        <div className="flex bg-white flex-1">
+          {/* Sidebar */}
+          <div className="w-80 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+            <FilterBar 
+              filters={filters} 
+              setFilters={setFilters} 
+              setPage={setPage} 
+              aggregations={aggregations}
+            />
+          </div>
+          
+          {/* Main Content */}
+          <div className="flex-1 bg-gray-50">
+            {/* Search and Controls */}
+            <div className="bg-white border-b border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <ViewToggle view={viewType} setView={setViewType} />
+                  <span className="text-sm text-gray-600">Latest Updated</span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {total > 0 && `Page ${page} of ${Math.ceil(total / size)}`}
+                </div>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-6">
+              {loading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="text-gray-500">Loading datasets...</div>
+                </div>
+              ) : (
+                <>
+                  {viewType === 'card' ? <CardView datasets={datasets} /> : <ListView datasets={datasets} />}
+
+                  {total > 0 && (
+                    <div className="mt-8 flex justify-center">
+                      <Pagination page={page} setPage={setPage} total={total} size={size} />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-blue-600 text-white py-6 px-6 mt-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-2">
+                <span className="text-lg font-bold">🌐 CivicDataSpace</span>
+              </div>
+              <nav className="hidden md:flex space-x-6 text-sm">
+                <a href="#" className="hover:text-blue-200 transition-colors">ABOUT US</a>
+                <a href="#" className="hover:text-blue-200 transition-colors">SITEMAP</a>
+                <a href="#" className="hover:text-blue-200 transition-colors">CONTACT US</a>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm">💬</span>
+                </div>
+                <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm">📘</span>
+                </div>
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm">🐦</span>
+                </div>
+                <div className="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm">💼</span>
+                </div>
+              </div>
+              <div className="text-xs text-blue-200">
+                made by 💖
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 }
