@@ -44,7 +44,7 @@ export default function Home() {
       <Head>
         <title>Dataset Listing - CivicDataSpace</title>
       </Head>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-gray-100">
         {/* Header */}
         <div className="bg-blue-600 text-white py-3 px-6">
           <div className="flex items-center justify-between">
@@ -73,9 +73,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex bg-white flex-1">
+        <div className="flex">
           {/* Sidebar */}
-          <div className="w-80 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+          <div className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
             <FilterBar 
               filters={filters} 
               setFilters={setFilters} 
@@ -85,16 +85,35 @@ export default function Home() {
           </div>
           
           {/* Main Content */}
-          <div className="flex-1 bg-gray-50">
+          <div className="flex-1">
             {/* Search and Controls */}
-            <div className="bg-white border-b border-gray-200 p-6">
+            <div className="bg-white border-b border-gray-200 p-4">
               <div className="flex items-center justify-between">
+                <div className="flex-1 max-w-lg">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Start typing to search for any Dataset"
+                      value={filters.query}
+                      onChange={(e) => {
+                        setFilters({ ...filters, query: e.target.value });
+                        setPage(1);
+                      }}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex items-center space-x-4">
                   <ViewToggle view={viewType} setView={setViewType} />
-                  <span className="text-sm text-gray-600">Latest Updated</span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {total > 0 && `Page ${page} of ${Math.ceil(total / size)}`}
+                  <select className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <option>Latest Updated</option>
+                    <option>Alphabetical</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -107,53 +126,20 @@ export default function Home() {
                 </div>
               ) : (
                 <>
+                  <div className="mb-4 text-sm text-gray-600">
+                    Showing {datasets.length} of {total} results
+                  </div>
+                  
                   {viewType === 'card' ? <CardView datasets={datasets} /> : <ListView datasets={datasets} />}
 
-                  {total > 0 && (
-                    <div className="mt-8 flex justify-center">
-                      <Pagination page={page} setPage={setPage} total={total} size={size} />
-                    </div>
-                  )}
+                  <div className="mt-8">
+                    <Pagination page={page} setPage={setPage} total={total} size={size} />
+                  </div>
                 </>
               )}
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="bg-blue-600 text-white py-6 px-6 mt-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold">🌐 CivicDataSpace</span>
-              </div>
-              <nav className="hidden md:flex space-x-6 text-sm">
-                <a href="#" className="hover:text-blue-200 transition-colors">ABOUT US</a>
-                <a href="#" className="hover:text-blue-200 transition-colors">SITEMAP</a>
-                <a href="#" className="hover:text-blue-200 transition-colors">CONTACT US</a>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">💬</span>
-                </div>
-                <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">📘</span>
-                </div>
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🐦</span>
-                </div>
-                <div className="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">💼</span>
-                </div>
-              </div>
-              <div className="text-xs text-blue-200">
-                made by 💖
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );
